@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<header th:include="include :: top"></header>
+<style>
+    .divcss5 {
+        border: 1px solid #000;
+        width: 33%;
+        height: 200px
+    }
+
+    .divcss5 img {
+        width: 33%;
+        height: 200px
+    }
+
+</style>
+<body class="blog">
+<hr>
+<!-- nav start -->
+<nav class="am-g am-g-fixed blog-fixed blog-nav">
+    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only blog-button"
+            data-am-collapse="{target: '#blog-collapse'}"><span class="am-sr-only">导航切换</span> <span
+            class="am-icon-bars"></span></button>
+
+    <div class="am-collapse am-topbar-collapse" id="blog-collapse">
+        <ul class="am-nav am-nav-pills am-topbar-nav">
+            <li class="tab "><a href="/photo/userPhotoList">首页</a></li>
+            <li class="tab"><a href="/photo/imgs">图片库</a></li>
+            <li class="tab"><a href="/index/addPhoto">图片上传</a></li>
+            <li class="tab am-active"><a href="/index/addPhotos">首页轮播上传</a></li>
+            <li class="tab"><a href="/photo/fuliPhotos">福利哦！！！</a></li>
+        </ul>
+        <form class="am-topbar-form am-topbar-right am-form-inline" role="search">
+            <div class="am-form-group">
+                <input type="text" class="am-form-field am-input-sm" placeholder="搜索">
+            </div>
+        </form>
+    </div>
+
+</nav>
+<hr>
+<div class="am-g am-g-fixed blog-fixed am-u-sm-centered blog-article-margin">
+
+
+    <button id="test1">点击上传</button>
+    <div  id="photos">
+    </div>
+
+
+
+</div>
+<div th:include="include :: footer"></div>
+<div th:include="include :: socket"></div>
+</body>
+
+
+<script>
+    layui.use('upload', function () {
+        var upload = layui.upload;
+        var imgUrl = url + "/upFile";
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#test1' //绑定元素
+            , url: imgUrl //上传接口
+            , done: function (res) {
+                $("#photos").append(" <img class='divcss5'  src='" + urlDisplay + res.path + "'>");
+                // $("#img").attr("src",urlDisplay+res.path);
+                // $("#imgUrl").val(urlDisplay+res.path);
+
+                $.post("/photo/addLunBoPhoto",{"imgUrl":urlDisplay+res.path,"imgType":10},function (res) {
+                    if(res.status == 1){
+                        layer.msg("恭喜，添加成功！");
+                    }else {
+                        layer.msg(res.msg);
+                    }
+                }).error(function (res) {
+                    layer.msg("添加失败，联系管理员：544852009@qq.com");
+                })
+
+            }
+            , error: function (res) {
+                layer.msg("上传失败：" + JSON.stringify(res));
+            }
+        });
+    });
+</script>
+</div>
+<script>
+</script>
+</html>

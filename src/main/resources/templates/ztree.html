@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ztree</title>
+    <link rel="stylesheet" href="myfile/ztree/zTreeStyle.css" type="text/css">
+    <script type="text/javascript" src="myfile/ztree/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="myfile/ztree/jquery.ztree.core.js"></script>
+</head>
+<body>
+<ul id="tree" class="ztree" style="width:260px; overflow:auto;"></ul>
+</body>
+<style type="text/css">
+    .ztree li span.button.ico_docu {
+        background-position: -110px -48px;
+        margin-right: 2px;
+        vertical-align: top;
+    }
+</style>
+<script>
+    var zTree;
+    var demoIframe;
+
+    var setting = {
+        view: {
+            dblClickExpand: false,
+            showLine: true,
+            selectedMulti: false
+        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "pId",
+                rootPId: ""
+            }
+        },
+        callback: {
+            // beforeClick: function (treeId, treeNode) {
+            //     var zTree = $.fn.zTree.getZTreeObj("tree");
+            //     if (treeNode.isParent) {
+            //         zTree.expandNode(treeNode);
+            //         return false;
+            //     } else {
+            //         demoIframe.attr("src", treeNode.file + ".html");
+            //         return true;
+            //     }
+            // },
+            onNodeCreated: zTreeOnNodeCreated,
+            onMouseDown: onMouseDown,
+        }
+
+
+    };
+
+    //定义函数zTreeOnNodeCreated
+    function zTreeOnNodeCreated(event, treeId, treeNode) {
+//salesman是树节点的名称，不是树本身内置代码，需要后台定义
+//该处判断假如treeNode节点是salersman，那么设置css样式
+        $('#' + treeNode.tId + '_ico').css("background", "url('myfile/layui/images/face/1.gif') center center/15px 15px no-repeat");
+//$('#'+treeNode.tId+'_ico')是多个赋值方式
+    }
+
+    function onMouseDown(event, treeId, treeNode) {
+        console.log(treeNode.name + "   鼠标按下后"+treeNode.id);
+    }
+    var zNodes = [{id:1,pId:0,name:'one'},{id:2,pId:1,name:'two'},{id:2,pId:1,name:'tw2o'}];
+
+    $(document).ready(function () {
+        var t = $("#tree");
+        t = $.fn.zTree.init(t, setting, zNodes);
+        demoIframe = $("#testIframe");
+        demoIframe.bind("load", loadReady);
+        var zTree = $.fn.zTree.getZTreeObj("tree");
+        zTree.expandAll(true);
+
+    });
+
+
+
+    function loadReady() {
+        var bodyH = demoIframe.contents().find("body").get(0).scrollHeight,
+            htmlH = demoIframe.contents().find("html").get(0).scrollHeight,
+            maxH = Math.max(bodyH, htmlH), minH = Math.min(bodyH, htmlH),
+            h = demoIframe.height() >= maxH ? minH : maxH;
+        if (h < 530) h = 530;
+        demoIframe.height(h);
+    }
+
+</script>
+</html>

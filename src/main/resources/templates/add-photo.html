@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<header th:include="include :: top"></header>
+<style>
+    .divcss5 {
+        border: 1px solid #000;
+
+        height: 500px
+    }
+
+    .divcss5 img {
+
+        height: 500px
+    }
+
+    .layui-form-label {
+        float: left;
+        display: block;
+        padding: 9px 15px;
+        width: 100px;
+    }
+</style>
+<body class="blog">
+<hr>
+<!-- nav start -->
+<nav class="am-g am-g-fixed blog-fixed blog-nav">
+    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only blog-button"
+            data-am-collapse="{target: '#blog-collapse'}"><span class="am-sr-only">导航切换</span> <span
+            class="am-icon-bars"></span></button>
+
+    <div class="am-collapse am-topbar-collapse" id="blog-collapse">
+        <ul class="am-nav am-nav-pills am-topbar-nav">
+            <li class="tab "><a href="/photo/userPhotoList">首页</a></li>
+            <!--<li class="tab"><a href="/photo/imgs">图片库</a></li>-->
+            <li class="tab am-active"><a href="/index/addPhoto">图片上传</a></li>
+            <li class="tab"><a href="/photo/fuliPhotos">最新靓妹</a></li>
+        </ul>
+        <form class="am-topbar-form am-topbar-right am-form-inline" role="search">
+            <div class="am-form-group">
+                <input type="text" class="am-form-field am-input-sm" placeholder="搜索">
+            </div>
+        </form>
+    </div>
+
+</nav>
+<hr>
+<div class="am-g am-g-fixed blog-fixed am-u-sm-centered blog-article-margin">
+
+
+    <form class="layui-form" action="">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">标题</label>
+            <div class="layui-input-block">
+                <input type="text" name="imgTitle" required lay-verify="required" placeholder="请输入标题（10字以内）" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-block">
+                <input type="radio" name="imgType" value="0" title="生活" checked>
+                <input type="radio" name="imgType" value="1" title="游戏" >
+                <input type="radio" name="imgType" value="2" title="娱乐" >
+                <input type="radio" name="imgType" value="3" title="其他" >
+            </div>
+        </div>
+        <!--<div class="layui-form-item">-->
+            <!--<label class="layui-form-label">选择框</label>-->
+            <!--<div class="layui-input-block">-->
+                <!--<select name="city" lay-verify="required">-->
+                    <!--<option value=""></option>-->
+                    <!--<option value="0">北京</option>-->
+                    <!--<option value="1">上海</option>-->
+                    <!--<option value="2">广州</option>-->
+                    <!--<option value="3">深圳</option>-->
+                    <!--<option value="4">杭州</option>-->
+                <!--</select>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否展示</label>
+            <div class="layui-input-block">
+                <input type="radio" name="imgStatus" value="1" title="展示" checked>
+                <input type="radio" name="imgStatus" value="0" title="不展示" >
+            </div>
+        </div>
+        <!--<div class="layui-form-item">-->
+            <!--<label class="layui-form-label">是否展示</label>-->
+            <!--<div class="layui-input-block">-->
+                <!--<input type="checkbox" name="imgStatus" lay-skin="switch">-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">它的故事</label>
+            <div class="layui-input-block">
+                <textarea name="imgDetial" placeholder="讲讲照片的故事吧" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <input type="hidden" id="imgUrl" lay-verify="imgUrl" name="imgUrl">
+        <!--<div class="layui-form-item layui-form-text">-->
+            <!--&lt;!&ndash;<button type="button" class="layui-btn" id="test1">&ndash;&gt;-->
+                <!--&lt;!&ndash;<i class="layui-icon">&#xe67c;</i>上传图片&ndash;&gt;-->
+            <!--&lt;!&ndash;</button>&ndash;&gt;-->
+            <!--&lt;!&ndash;<label class="layui-form-label" id="test1">文本域</label>&ndash;&gt;-->
+            <!--&lt;!&ndash;<div class="layui-input-block">&ndash;&gt;-->
+                <!--&lt;!&ndash;<textarea name="desc" placeholder="请输入内容" class="layui-textarea"></textarea>&ndash;&gt;-->
+            <!--&lt;!&ndash;</div>&ndash;&gt;-->
+        <!--</div>-->
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" id="test1"  >上传图片</button>
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="divcss5">
+        <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-img">
+            <img id="img">
+        </div>
+    </div>
+
+
+
+</div>
+<div th:include="include :: footer"></div>
+<div th:include="include :: socket"></div>
+</body>
+<script>
+    //Demo
+    layui.use('form', function () {
+        var form = layui.form;
+
+        //自定义验证规则
+        form.verify({
+            imgUrl: function(value){
+                if(value == "" || value == null){
+                    return '亲，还没上传图片呢';
+                }
+            }
+
+        });
+
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+
+
+            $.ajax({
+                url: '/photo/add',
+                method: 'post',
+                data: data.field,
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.code == '0') {
+                        layer.msg("您的美好生活已经记录", function () {
+                            window.location.href="/photo/userPhotoList";
+                        }, 1000);
+                    }
+                    else
+                        layer.msg(res.msg);
+                },
+                error: function (data) {
+                    layer.msg("操作失败，联系管理员吧QQ:544852009");
+                }
+            })
+            return false;
+        });
+    });
+</script>
+
+<script>
+    layui.use('upload', function () {
+        var upload = layui.upload;
+        var imgUrl = url + "/upFile";
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#test1' //绑定元素
+            , url: imgUrl //上传接口
+            , done: function (res) {
+                // $("#photos").append(" <img style='display: inline-block' width='500' height='500' src='" + urlDisplay + res.path + "'>");
+                $("#img").attr("src",urlDisplay+res.path);
+                $("#imgUrl").val(urlDisplay+res.path);
+            }
+            , error: function (res) {
+                layer.msg("上传失败：" + JSON.stringify(res));
+            }
+        });
+    });
+</script>
+</div>
+<script>
+</script>
+</html>

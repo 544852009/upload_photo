@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<header th:include="include :: top"></header>
+<body id="blog">
+
+
+<!-- nav start -->
+<hr>
+<!-- nav start -->
+<nav class="am-g am-g-fixed blog-fixed blog-nav">
+    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only blog-button"
+            data-am-collapse="{target: '#blog-collapse'}"><span class="am-sr-only">导航切换</span> <span
+            class="am-icon-bars"></span></button>
+
+    <div th:include="include :: navTop"></div>
+
+</nav>
+<hr>
+<!-- nav end -->
+<style>
+    .photo-box {
+        float: left;
+        text-align: center;
+    }
+
+    .photo-box .photo-in {
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    .photo-box .photo-demo {
+        width: 150px;
+        border: 5px;
+        border-radius: 20px;
+    }
+
+    .div-time {
+        width: 150px;
+        text-align: center;
+        padding-top: 10px;
+    }
+
+    .div-time-in {
+        display: inline-block;
+        width: 40%;
+        color: #d4cd25;
+    }
+</style>
+<!-- content srart -->
+<div class="am-g am-g-fixed blog-fixed blog-content">
+    <figure data-am-widget="figure" class="am am-figure am-figure-default ">
+        <input type="hidden" th:value="${imgType}" id="imgType">
+        <div class="photo-box" id="photo-tpl">
+        </div>
+    </figure>
+
+</div>
+
+<div class="am-modal am-modal-confirm" tabindex="-1" id="my-confirm">
+    <div class="am-modal-dialog">
+        <div class="am-modal-hd">PHOTO KU</div>
+        <div class="am-modal-bd">
+            Are you sure you want to delete it?
+        </div>
+        <div class="am-modal-footer">
+            <span class="am-modal-btn" data-am-modal-cancel>cancel</span>
+            <span class="am-modal-btn" data-am-modal-confirm>sure</span>
+        </div>
+    </div>
+</div>
+
+<!--[if (gte IE 9)|!(IE)]><!-->
+<script src="/myfile/assets/js/jquery.min.js"></script>
+<!--<![endif]-->
+<!--[if lte IE 8 ]>
+<script src="http://libs.baidu.com/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://cdn.staticfile.org/modernizr/2.8.3/modernizr.js"></script>
+<script src="assets/js/amazeui.ie8polyfill.min.js"></script>
+<![endif]-->
+<script src="/myfile/assets/js/amazeui.min.js"></script>
+<script src="/myfile/assets/js/pinto.min.js"></script>
+
+<script th:src="@{/myfile/layui/layui.all.js}"></script>
+<script th:src="@{/myfile/js/template-web.js}"></script>
+<div th:include="include :: socket"></div>
+</body>
+
+<script type="text/html" id="photo-temp">
+    {{each photoList}}
+
+
+    <div class="photo-in"><a href="/photo/fuliPhotosDetail?parentId={{$value.parentId}}" target="_blank">
+        <img  class="photo-demo" src="{{$value.imgUrl}}">
+    </a>
+        <div onclick="deleteImg('{{$value.parentId}}')" style="background-color: #fcb568;border-radius: 30px;width: 100%; font-size: 10px">删&nbsp;除</div>
+    </div>
+
+    {{/each}}
+</script>
+
+<script>
+    var allPage;
+    var page = 0;
+    var pageSize = 20;
+    var off_on = true; //分页开关(滚动加载方法 1 中用的)
+    var timers = null; //定时器(滚动加载方法 2 中用的)
+    var imgType = $("#imgType").val();
+
+    //加载数据
+    var LoadingDataFn = function () {
+        $.post("/photo/userPhotoTypePageList", {
+            "page": page,
+            "pageSize": pageSize,
+            "imgType": imgType
+        }, function (res) {
+            if (res.status == 1) {
+                var html = template("photo-temp", res.data);
+                $("#photo-tpl").append(html);
+                allPage = res.data.allPage;
+            } else {
+                layer.msg(res.msg);
+            }
+
+            console.log(page + "-------->" + allPage);
+        });
+        off_on = true; //[重要]这是使用了 {滚动加载方法1}  时 用到的 ！！！[如果用  滚动加载方法1 时：off_on 在这里不设 true的话， 下次就没法加载了哦！]
+    };
+
+    //初始化， 第一次加载
+    $(document).ready(function () {
+        LoadingDataFn();
+        page++;
+    });
+
+    //滚动加载方法2
+    $('#main').scroll(function () {
+        //当时滚动条离底部60px时开始加载下一页的内容
+        if (($(this)[0].scrollTop + $(this).height() + 60) >= $(this)[0].scrollHeight) {
+            clearTimeout(timers);
+            //这里还可以用 [ 延时执行 ] 来控制是否加载 （这样就解决了 当上页的条件满足时，一下子加载多次的问题啦）
+            timers = setTimeout(function () {
+
+                if (page == allPage) {
+                    layer.msg("兄弟，到底啦！！！");
+                    return;
+                }
+                // console.log("第" + page + "页");
+                LoadingDataFn(); //调用执行上面的加载方法
+                page++;
+            }, 300);
+        }
+    });
+
+    //还可以基window窗口（body）来添加滚动事件, (因为布局不同,所以在这里没效果，因为[上面是基于body中的某个元素来添加滚动事的])
+    $(window).scroll(function () {
+        //当时滚动条离底部60px时开始加载下一页的内容
+        if (($(window).height() + $(window).scrollTop() + 60) >= $(document).height()) {
+            clearTimeout(timers);
+            timers = setTimeout(function () {
+                if (page == allPage) {
+                    layer.msg("兄弟，到底啦！！！");
+                    return;
+                }
+                // console.log("第" + page + "页");
+                LoadingDataFn();
+                page++;
+            }, 300);
+        }
+    });
+
+</script>
+
+<script>
+    function deleteImg(parentId) {
+        $('#my-confirm').modal({
+            relatedTarget: this,
+            onConfirm: function (options) {
+                $.ajax({
+                    type: "POST",
+                    url: "/photo/deleteImgType",
+                    contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+                    data: {"parentId": parentId},
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.status == 1) {
+                            layer.msg("删除成功！", function () {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    },
+                    error: function (e) {
+                        layer.msg("操作失败，联系管理员：544852009@qq.com");
+                    }
+                })
+                ;
+
+            },
+            // closeOnConfirm: false,
+            onCancel: function () {
+
+            }
+        });
+    }
+
+</script>
+</html>
