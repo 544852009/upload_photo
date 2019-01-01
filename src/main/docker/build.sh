@@ -2,3 +2,4 @@
 echo "start sh--------->"
 docker build -t upload .
 echo "end sh--------->"
+ 
